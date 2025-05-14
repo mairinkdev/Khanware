@@ -27,10 +27,66 @@ function addFeature(features) {
                     key === 'style' ? label.style.cssText = value : label.setAttribute(key, value);
                 });
             }
-            label.innerHTML = `${element.outerHTML} ${attribute.label}`;
+
+            // Adicionar elementos personalizados para melhorar a aparência dos botões
+            if (attribute.type === 'checkbox') {
+                label.innerHTML = `
+                    <div class="kw-switch-container">
+                        ${element.outerHTML}
+                        <div class="kw-switch-track"></div>
+                        <div class="kw-switch-thumb"></div>
+                    </div>
+                    <span class="kw-label-text">${attribute.label}</span>
+                `;
+            } else {
+                label.innerHTML = `${element.outerHTML} <span class="kw-label-text">${attribute.label}</span>`;
+            }
+
+            // Adicionar indicador de sucesso para itens ativados
+            if (attribute.type === 'checkbox') {
+                const successIndicator = document.createElement('div');
+                successIndicator.className = 'kw-success-indicator';
+                successIndicator.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 16.2L4.8 12L3.4 13.4L9 19L21 7L19.6 5.6L9 16.2Z" fill="#72ff72" opacity="0"/>
+                    </svg>
+                `;
+                label.appendChild(successIndicator);
+            }
+
+            // Adicionar efeito ripple para os cliques
+            const rippleEffect = document.createElement('div');
+            rippleEffect.className = 'kw-ripple-effect';
+            label.appendChild(rippleEffect);
+
             feature.appendChild(label);
         } else {
-            feature.appendChild(element);
+            if (attribute.type === 'range') {
+                const rangeContainer = document.createElement('div');
+                rangeContainer.className = 'kw-range-container';
+                rangeContainer.appendChild(element);
+
+                // Adicionar marcadores para o slider
+                const markers = document.createElement('div');
+                markers.className = 'kw-range-markers';
+
+                // Determinar min, max e step
+                const min = parseInt(element.getAttribute('min') || '1');
+                const max = parseInt(element.getAttribute('max') || '3');
+
+                // Adicionar marcadores para o slider
+                for (let i = min; i <= max; i++) {
+                    const marker = document.createElement('div');
+                    marker.className = 'kw-range-marker';
+                    marker.setAttribute('data-value', i.toString());
+                    markers.appendChild(marker);
+                }
+
+                rangeContainer.appendChild(markers);
+                feature.appendChild(rangeContainer);
+            } else {
+                feature.appendChild(element);
+            }
         }
     });
     dropdownMenu.innerHTML += feature.outerHTML;
@@ -219,38 +275,109 @@ dropdownMenu.innerHTML = `
             font-weight: 600;
         }
 
+        /* Estilos melhorados para os switches */
+        .kw-switch-container {
+            position: relative;
+            width: 36px;
+            height: 18px;
+            margin-right: 10px;
+        }
+
         input[type="checkbox"] {
-            appearance: none;
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .kw-switch-track {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 36px;
             height: 18px;
             background-color: rgba(50, 50, 50, 0.8);
             border-radius: 10px;
-            margin-right: 10px;
-            cursor: pointer;
-            position: relative;
             transition: all 0.3s ease;
         }
 
-        input[type="checkbox"]:before {
-            content: '';
+        .kw-switch-thumb {
             position: absolute;
+            top: 2px;
+            left: 2px;
             width: 14px;
             height: 14px;
             border-radius: 50%;
-            top: 2px;
-            left: 2px;
             background-color: white;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
-        input[type="checkbox"]:checked {
+        input[type="checkbox"]:checked + .kw-switch-track {
             background-color: rgba(114, 255, 114, 0.6);
         }
 
-        input[type="checkbox"]:checked:before {
+        input[type="checkbox"]:checked ~ .kw-switch-thumb {
             left: 20px;
+            background-color: white;
         }
 
+        input[type="checkbox"]:checked ~ .kw-success-indicator svg path {
+            opacity: 1;
+            transition: opacity 0.3s ease 0.1s;
+        }
+
+        .kw-label-text {
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+
+        label:hover .kw-label-text {
+            transform: translateX(3px);
+        }
+
+        /* Efeito Ripple */
+        .kw-ripple-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .kw-ripple-effect:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.4);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        label:active .kw-ripple-effect:after {
+            animation: ripple 0.4s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+
+        /* Estilos melhorados para campos de texto */
         input[type="text"], input[type="number"] {
             width: calc(100% - 20px);
             border: none;
@@ -267,6 +394,13 @@ dropdownMenu.innerHTML = `
             background-color: rgba(70, 70, 70, 0.7);
             outline: none;
             box-shadow: 0 0 0 2px rgba(114, 255, 114, 0.4);
+        }
+
+        /* Estilos melhorados para sliders */
+        .kw-range-container {
+            width: 100%;
+            padding: 10px 0;
+            position: relative;
         }
 
         input[type="range"] {
@@ -286,27 +420,60 @@ dropdownMenu.innerHTML = `
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: 0 0 5px rgba(114, 255, 114, 0.5);
         }
 
         input[type="range"]::-webkit-slider-thumb:hover {
             transform: scale(1.1);
         }
 
+        .kw-range-markers {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .kw-range-marker {
+            position: relative;
+            width: 4px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .kw-range-marker:after {
+            content: attr(data-value);
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Melhorias gerais */
         label {
             display: flex;
             align-items: center;
             color: rgba(255, 255, 255, 0.8);
-            padding: 8px 0;
+            padding: 8px 10px;
             border-radius: 8px;
             transition: all 0.2s ease;
             margin: 2px 0;
             font-weight: 300;
+            position: relative;
+            overflow: hidden;
         }
 
         label:hover {
             background-color: rgba(255, 255, 255, 0.05);
             transform: translateX(3px);
             color: white;
+        }
+
+        label:active {
+            background-color: rgba(255, 255, 255, 0.08);
+            transform: scale(0.98);
         }
 
         feature {
@@ -329,12 +496,50 @@ dropdownMenu.innerHTML = `
             border-radius: 8px;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .user-info:hover {
+            background-color: rgba(114, 255, 114, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Indicador de sucesso */
+        .kw-success-indicator {
+            margin-left: auto;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        label:hover .kw-success-indicator {
+            opacity: 1;
         }
 
         /* Add these nice gradients for the categorized features */
         .cheats-section { color: rgba(255, 125, 125, 0.9); }
         .visuals-section { color: rgba(125, 255, 255, 0.9); }
         .settings-section { color: rgba(255, 255, 125, 0.9); }
+
+        /* Botão para reiniciar configurações */
+        .kw-reset-button {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 8px 0;
+            background-color: rgba(255, 100, 100, 0.1);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .kw-reset-button:hover {
+            background-color: rgba(255, 100, 100, 0.2);
+            transform: translateY(-2px);
+        }
     </style>
 `;
 
@@ -377,6 +582,61 @@ userInfoElement.innerHTML = `
 `;
 dropdownMenu.appendChild(userInfoElement);
 
+// Adicionar botão de reset no final do menu
+const resetButton = document.createElement('div');
+resetButton.className = 'kw-reset-button';
+resetButton.textContent = 'Reiniciar Configurações';
+resetButton.addEventListener('click', () => {
+    // Efeito visual ao clicar
+    resetButton.style.transform = 'scale(0.95)';
+    setTimeout(() => resetButton.style.transform = '', 200);
+
+    // Som de clique
+    playAudio('https://r2.e-z.host/4d0a0bea-60f8-44d6-9e74-3032a64a9f32/5os0bypi.wav');
+
+    // Confirmar reset
+    const shouldReset = confirm('Deseja restaurar todas as configurações para os valores padrão?');
+    if (shouldReset) {
+        // Reset de configurações
+        features.questionSpoof = true;
+        features.videoSpoof = true;
+        features.showAnswers = false;
+        features.autoAnswer = false;
+        features.repeatQuestion = false;
+        features.nextRecomendation = false;
+        features.minuteFarmer = false;
+        features.customBanner = false;
+        features.rgbLogo = false;
+        features.darkMode = true;
+        features.onekoJs = false;
+
+        featureConfigs.autoAnswerDelay = 3;
+        featureConfigs.customUsername = "";
+        featureConfigs.customPfp = "";
+
+        // Atualizar UI
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            const settingPath = checkbox.getAttribute('setting-data');
+            if (settingPath) {
+                const settingValue = settingPath.split('.').reduce((obj, prop) => obj[prop], window);
+                checkbox.checked = settingValue;
+            }
+        });
+
+        document.querySelectorAll('input[type="text"], input[type="range"]').forEach(input => {
+            const settingPath = input.getAttribute('setting-data');
+            if (settingPath) {
+                const settingValue = settingPath.split('.').reduce((obj, prop) => obj[prop], window);
+                input.value = settingValue;
+            }
+        });
+
+        // Mostrar toast confirmando o reset
+        sendToast("⚙️ Configurações restauradas!", 3000);
+    }
+});
+
+// Adicionar após inicializar os recursos
 handleInput(['questionSpoof', 'videoSpoof', 'showAnswers', 'nextRecomendation', 'repeatQuestion', 'minuteFarm', 'customBanner', 'rgbLogo']);
 handleInput(['customName', 'customPfp'])
 handleInput('autoAnswer', checked => checked && !features.questionSpoof && (document.querySelector('[setting-data="features.questionSpoof"]').checked = features.questionSpoof = true));
@@ -386,6 +646,9 @@ handleInput('autoAnswerDelay', value => {
 });
 handleInput('darkMode', checked => checked ? (DarkReader.setFetchMethod(window.fetch), DarkReader.enable()) : DarkReader.disable());
 handleInput('onekoJs', checked => { onekoEl = document.getElementById('oneko'); if (onekoEl) { onekoEl.style.display = checked ? null : "none" } });
+
+// Adicionar o botão de reset ao menu
+dropdownMenu.appendChild(resetButton);
 
 // Atualizar o valor do slider ao carregar
 document.querySelector('.range-value').textContent = `Delay: ${featureConfigs.autoAnswerDelay}s`;

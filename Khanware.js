@@ -225,6 +225,18 @@ async function hideSplashScreen() {
     setTimeout(() => splashScreen.remove(), 1000);
 };
 
+async function setupAfterSplash() {
+    // Esconder o splash screen
+    hideSplashScreen();
+
+    // Continuar com o resto da inicialização
+    hideSplashScreen();
+    setupMenu();
+    setupMain();
+
+    console.clear();
+}
+
 async function loadScript(url, label) { return fetch(url).then(response => response.text()).then(script => { loadedPlugins.push(label); eval(script); }); }
 async function loadCss(url) { return new Promise((resolve) => { const link = document.createElement('link'); link.rel = 'stylesheet'; link.type = 'text/css'; link.href = url; link.onload = () => resolve(); document.head.appendChild(link); }); }
 
@@ -272,11 +284,47 @@ loadScript('https://cdn.jsdelivr.net/npm/toastify-js', 'toastifyPlugin')
 
         loadedPlugins.forEach(plugin => sendToast(`🪝 ${plugin} Loaded!`, 2000, 'top'));
 
-        hideSplashScreen();
-        setupMenu();
-        setupMain();
+        // Modificar o splash screen para ter um botão de continuar
+        setTimeout(() => {
+            const continueButton = document.createElement('div');
+            continueButton.style.cssText = `
+                margin-top: 30px;
+                padding: 10px 25px;
+                background-color: rgba(114, 255, 114, 0.2);
+                border: 1px solid rgba(114, 255, 114, 0.5);
+                border-radius: 8px;
+                color: white;
+                font-size: 14px;
+                cursor: pointer;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+                user-select: none;
+            `;
+            continueButton.innerHTML = "Continuar";
+            continueButton.addEventListener('click', setupAfterSplash);
+            continueButton.addEventListener('mouseenter', () => {
+                continueButton.style.backgroundColor = "rgba(114, 255, 114, 0.3)";
+                continueButton.style.transform = "translateY(-2px)";
+            });
+            continueButton.addEventListener('mouseleave', () => {
+                continueButton.style.backgroundColor = "rgba(114, 255, 114, 0.2)";
+                continueButton.style.transform = "translateY(0)";
+            });
 
-        console.clear();
+            // Adicionar botão ao splash screen
+            let contentContainer = splashScreen.querySelector('div');
+            if (!contentContainer) {
+                contentContainer = splashScreen;
+            }
+            contentContainer.appendChild(continueButton);
+
+            // Mostrar botão após um atraso
+            setTimeout(() => {
+                continueButton.style.opacity = '1';
+                continueButton.style.transform = 'translateY(0)';
+            }, 500);
+        }, 4000); // Mostrar o botão após 4 segundos, dando tempo para ver a animação
     });
 
 /* Thank you to everyone who has purchased access to my cheat as of 10/28/24.
