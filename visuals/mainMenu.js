@@ -37,39 +37,39 @@ function addFeature(features) {
 }
 function handleInput(ids, callback = null) {
     (Array.isArray(ids) ? ids.map(id => document.getElementById(id)) : [document.getElementById(ids)])
-    .forEach(element => {
-        if (!element) return;
-        const setting = element.getAttribute('setting-data'),
-            dependent = element.getAttribute('dependent'),
-            handleEvent = (e, value) => {
-                setFeatureByPath(setting, value);
-                if (callback) callback(value, e);
-            };
+        .forEach(element => {
+            if (!element) return;
+            const setting = element.getAttribute('setting-data'),
+                dependent = element.getAttribute('dependent'),
+                handleEvent = (e, value) => {
+                    setFeatureByPath(setting, value);
+                    if (callback) callback(value, e);
+                };
 
-        if (element.type === 'checkbox') {
-            element.addEventListener('change', (e) => {
-                playAudio('https://r2.e-z.host/4d0a0bea-60f8-44d6-9e74-3032a64a9f32/5os0bypi.wav');
-                handleEvent(e, e.target.checked);
-                if (dependent) dependent.split(',').forEach(dep => 
-                    document.querySelectorAll(`.${dep}`).forEach(depEl => 
-                        depEl.style.display = e.target.checked ? null : "none"));
-            });
-        } else {
-            element.addEventListener('input', (e) => handleEvent(e, e.target.value));
-        }
-    });
+            if (element.type === 'checkbox') {
+                element.addEventListener('change', (e) => {
+                    playAudio('https://r2.e-z.host/4d0a0bea-60f8-44d6-9e74-3032a64a9f32/5os0bypi.wav');
+                    handleEvent(e, e.target.checked);
+                    if (dependent) dependent.split(',').forEach(dep =>
+                        document.querySelectorAll(`.${dep}`).forEach(depEl =>
+                            depEl.style.display = e.target.checked ? null : "none"));
+                });
+            } else {
+                element.addEventListener('input', (e) => handleEvent(e, e.target.value));
+            }
+        });
 }
 
 /* Watermark */
 Object.assign(watermark.style, {
     position: 'fixed', top: '0', left: '85%', width: '150px', height: '30px', backgroundColor: 'RGB(0,0,0,0.5)',
-    color: 'white', fontSize: '15px', fontFamily: 'MuseoSans, sans-serif', display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-    cursor: 'default', userSelect: 'none', padding: '0 10px',  borderRadius: '10px', zIndex: '1001', transition: 'transform 0.3s ease'
+    color: 'white', fontSize: '15px', fontFamily: 'MuseoSans, sans-serif', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    cursor: 'default', userSelect: 'none', padding: '0 10px', borderRadius: '10px', zIndex: '1001', transition: 'transform 0.3s ease'
 });
 
 if (device.mobile) watermark.style.left = '55%'
 
-watermark.innerHTML = `<span style="text-shadow: -1px 0.5px 0 #72ff72, -2px 0px 0 #2f672e;">KW</span> <span style="color:gray; padding-left:2px; font-family: Arial, sans-serif; font-size:10px">${ver}</span>`;
+watermark.innerHTML = `<span style="text-shadow: -1px 0.5px 0 #72ff72, -2px 0px 0 #2f672e;" class="kw-logo">KW</span> <span style="color:gray; padding-left:2px; font-family: Arial, sans-serif; font-size:10px">${ver}</span> <span style="color:#72ff72; font-size:10px; margin-left:5px;">+ mairinkdev</span>`;
 
 document.body.appendChild(watermark);
 
@@ -90,12 +90,52 @@ Object.assign(dropdownMenu.style, {
 
 dropdownMenu.innerHTML = `
     <style>
-        input[type="checkbox"] {appearance: none; width: 15px; height: 15px; background-color: #3a3a3b;
-        border: 1px solid #acacac; border-radius: 3px; margin-right: 5px; cursor: pointer;}
-        input[type="checkbox"]:checked {background-color: #540b8a; border-color: #720fb8;}
-        input[type="text"], input[type="number"], input[type="range"] {width: calc(100% - 10px); border: 1px solid #343434; 
-        color: white; accent-color: #540b8a; background-color: #540b8a; padding: 3px; border-radius: 3px; background: none;}
-        label {display: flex; align-items: center; color: #3a3a3b; padding-top: 3px;}
+        input[type="checkbox"] {
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background-color: #3a3a3b;
+            border: 1px solid #acacac;
+            border-radius: 3px;
+            margin-right: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #540b8a;
+            border-color: #720fb8;
+            box-shadow: 0 0 5px rgba(114, 15, 184, 0.5);
+        }
+        input[type="text"], input[type="number"], input[type="range"] {
+            width: calc(100% - 10px);
+            border: 1px solid #343434;
+            color: white;
+            accent-color: #540b8a;
+            background-color: #540b8a;
+            padding: 3px;
+            border-radius: 3px;
+            background: none;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #720fb8;
+            box-shadow: 0 0 5px rgba(114, 15, 184, 0.5);
+            outline: none;
+        }
+        label {
+            display: flex;
+            align-items: center;
+            color: #3a3a3b;
+            padding-top: 3px;
+            padding: 5px 3px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+        label:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            transform: translateX(3px);
+        }
     </style>
 `;
 
@@ -118,8 +158,8 @@ let featuresList = [
     { name: 'customName', type: 'text', variable: 'featureConfigs.customUsername', attributes: 'autocomplete="off"' },
     { name: 'Custom pfp', type: 'nonInput' },
     { name: 'customPfp', type: 'text', variable: 'featureConfigs.customPfp', attributes: 'autocomplete="off"' }
-  ];
-  
+];
+
 
 featuresList.push({ name: `${user.username} - UID: ${user.UID}`, type: 'nonInput', attributes: 'style="font-size:10px;"padding-left:5px;' });
 
@@ -130,7 +170,55 @@ handleInput(['customName', 'customPfp'])
 handleInput('autoAnswer', checked => checked && !features.questionSpoof && (document.querySelector('[setting-data="features.questionSpoof"]').checked = features.questionSpoof = true));
 handleInput('autoAnswerDelay', value => value && (featureConfigs.autoAnswerDelay = 4 - value));
 handleInput('darkMode', checked => checked ? (DarkReader.setFetchMethod(window.fetch), DarkReader.enable()) : DarkReader.disable());
-handleInput('onekoJs', checked => { onekoEl = document.getElementById('oneko'); if (onekoEl) {onekoEl.style.display = checked ? null : "none"} });
+handleInput('onekoJs', checked => { onekoEl = document.getElementById('oneko'); if (onekoEl) { onekoEl.style.display = checked ? null : "none" } });
 
-watermark.addEventListener('mouseenter', () => { dropdownMenu.style.display = 'flex'; playAudio('https://r2.e-z.host/4d0a0bea-60f8-44d6-9e74-3032a64a9f32/3kd01iyj.wav'); } );
+watermark.addEventListener('mouseenter', () => { dropdownMenu.style.display = 'flex'; playAudio('https://r2.e-z.host/4d0a0bea-60f8-44d6-9e74-3032a64a9f32/3kd01iyj.wav'); });
 watermark.addEventListener('mouseleave', e => { !watermark.contains(e.relatedTarget) && (dropdownMenu.style.display = 'none'); playAudio('https://r2.e-z.host/4d0a0bea-60f8-44d6-9e74-3032a64a9f32/rqizlm03.wav'); });
+
+/* Adicionar uma animação de pulso ao logo KW */
+const style = document.createElement('style');
+style.innerHTML = `
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    .kw-logo {
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+
+    /* Animação para o menu dropdown */
+    @keyframes slideIn {
+        from { transform: translateY(-10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    dropDownMenu {
+        animation: slideIn 0.3s ease;
+    }
+
+    /* Animação para os itens do menu */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(-5px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    feature label {
+        animation: fadeIn 0.3s ease;
+        animation-fill-mode: both;
+    }
+
+    /* Aplicar atraso a cada item */
+    feature label:nth-child(1) { animation-delay: 0.05s; }
+    feature label:nth-child(2) { animation-delay: 0.1s; }
+    feature label:nth-child(3) { animation-delay: 0.15s; }
+    feature label:nth-child(4) { animation-delay: 0.2s; }
+    feature label:nth-child(5) { animation-delay: 0.25s; }
+    feature label:nth-child(6) { animation-delay: 0.3s; }
+    feature label:nth-child(7) { animation-delay: 0.35s; }
+    feature label:nth-child(8) { animation-delay: 0.4s; }
+    feature label:nth-child(9) { animation-delay: 0.45s; }
+    feature label:nth-child(10) { animation-delay: 0.5s; }
+`;
+document.head.appendChild(style);
