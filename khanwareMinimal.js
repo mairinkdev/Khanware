@@ -22,37 +22,126 @@ const findAndClickBySelector = selector => { const element = document.querySelec
 function sendToast(text, duration = 5000, gravity = 'bottom') { Toastify({ text: text, duration: duration, gravity: gravity, position: "center", stopOnFocus: true, style: { background: "#000000" } }).showToast(); };
 
 async function showSplashScreen() {
-    splashScreen.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background-color:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;opacity:0;transition:opacity 0.5s ease;user-select:none;color:white;font-family:MuseoSans,sans-serif;font-size:30px;text-align:center;";
+    splashScreen.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background-color:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;opacity:0;transition:opacity 0.5s ease;user-select:none;color:white;font-family:MuseoSans,sans-serif;font-size:30px;text-align:center;overflow:hidden;";
 
-    const logo = document.createElement('div');
-    logo.innerHTML = '<span style="color:white;text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #72ff72;">KHANWARE</span><span style="color:#72ff72;text-shadow:0 0 10px #72ff72,0 0 20px #72ff72;">.</span><span style="color:#72ff72;text-shadow:0 0 10px #72ff72,0 0 20px #72ff72;">SPACE</span>';
-    logo.style.cssText = "transform:scale(0.8);opacity:0;transition:all 0.7s cubic-bezier(0.19, 1, 0.22, 1);";
+    // Adicionar partículas ao background
+    const particles = document.createElement('div');
+    particles.className = 'particles';
+    particles.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:-1;";
 
+    // Criar 20 partículas
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        const size = Math.random() * 4 + 2;
+        const duration = Math.random() * 15 + 10;
+        const startPositionX = Math.random() * 100;
+        const startPositionY = Math.random() * 100;
+        const opacity = Math.random() * 0.4 + 0.2;
+
+        particle.style.cssText = `
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            background-color: rgba(114, 255, 114, ${opacity});
+            border-radius: 50%;
+            top: ${startPositionY}%;
+            left: ${startPositionX}%;
+            filter: blur(1px);
+            box-shadow: 0 0 10px rgba(114, 255, 114, 0.4);
+            animation: float ${duration}s infinite linear;
+            animation-delay: ${Math.random() * 5}s;
+        `;
+
+        particles.appendChild(particle);
+    }
+
+    splashScreen.appendChild(particles);
+
+    // Container principal para conteúdo centralizado
+    const contentContainer = document.createElement('div');
+    contentContainer.style.cssText = "display:flex;flex-direction:column;align-items:center;justify-content:center;transform:scale(0.9);opacity:0;transition:all 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.5s;";
+
+    // Logo animado
+    const logoContainer = document.createElement('div');
+    logoContainer.style.cssText = "position:relative;margin-bottom:25px;";
+
+    const logoText = document.createElement('div');
+    logoText.innerHTML = `
+        <span style="color:white;font-size:35px;font-weight:bold;letter-spacing:-1px;">KHANWARE</span>
+        <span style="color:#72ff72;font-size:35px;font-weight:bold;letter-spacing:-1px;">.LITE</span>
+    `;
+
+    // Efeito glow sob o logo
+    const logoGlow = document.createElement('div');
+    logoGlow.style.cssText = "position:absolute;width:100%;height:15px;background:radial-gradient(ellipse at center, rgba(114, 255, 114, 0.3) 0%, rgba(114, 255, 114, 0) 70%);bottom:-15px;left:0;opacity:0;transition:opacity 1s ease 1.3s;filter:blur(5px);";
+
+    logoContainer.appendChild(logoText);
+    logoContainer.appendChild(logoGlow);
+    contentContainer.appendChild(logoContainer);
+
+    // Créditos
     const credits = document.createElement('div');
-    credits.innerHTML = '<span style="font-size:14px;margin-top:30px;opacity:0.8;">by <span style="color:#72ff72;">@im.nix</span> & <span style="color:#72ff72;">@mairinkdev</span></span>';
-    credits.style.cssText = "margin-top:20px;opacity:0;transform:translateY(20px);transition:all 0.7s cubic-bezier(0.19, 1, 0.22, 1) 0.3s;";
+    credits.style.cssText = "display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(20px);transition:all 0.7s ease 1.5s;";
 
-    const version = document.createElement('div');
-    version.innerHTML = `<span style="font-size:12px;margin-top:10px;opacity:0.5;">Minimal Edition</span>`;
-    version.style.cssText = "margin-top:10px;opacity:0;transform:translateY(20px);transition:all 0.7s cubic-bezier(0.19, 1, 0.22, 1) 0.5s;";
+    const authorText = document.createElement('div');
+    authorText.innerHTML = `<span style="font-size:12px;color:rgba(255,255,255,0.5);">by <span style="color:#72ff72;">@im.nix</span> & <span style="color:#72ff72;">@mairinkdev</span></span>`;
 
-    splashScreen.appendChild(logo);
-    splashScreen.appendChild(credits);
-    splashScreen.appendChild(version);
+    credits.appendChild(authorText);
+    contentContainer.appendChild(credits);
 
+    // Barra de loading animada
+    const loadingBar = document.createElement('div');
+    loadingBar.style.cssText = "width:180px;height:2px;background-color:rgba(50,50,50,0.5);margin-top:25px;border-radius:2px;overflow:hidden;opacity:0;transform:translateY(20px);transition:all 0.7s ease 1.7s;";
+
+    const loadingProgress = document.createElement('div');
+    loadingProgress.style.cssText = "width:0%;height:100%;background:linear-gradient(to right, #72ff72, #a0ff9d);border-radius:2px;transition:width 1.5s cubic-bezier(.08,.82,.17,1) 2s;";
+
+    loadingBar.appendChild(loadingProgress);
+    contentContainer.appendChild(loadingBar);
+
+    // Adicionar o container de conteúdo ao splash screen
+    splashScreen.appendChild(contentContainer);
+
+    // Adicionar animações CSS
+    const animStyles = document.createElement('style');
+    animStyles.innerHTML = `
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-15px, 15px) rotate(90deg); }
+            50% { transform: translate(15px, 30px) rotate(180deg); }
+            75% { transform: translate(-20px, -15px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(animStyles);
+
+    // Adicionar ao body
     document.body.appendChild(splashScreen);
 
+    // Iniciar animações após um pequeno atraso
     setTimeout(() => {
         splashScreen.style.opacity = '1';
-        logo.style.transform = 'scale(1)';
-        logo.style.opacity = '1';
+        contentContainer.style.opacity = '1';
+        contentContainer.style.transform = 'scale(1)';
+
+        // Mostrar o glow
+        logoGlow.style.opacity = '1';
+
+        // Mostrar os créditos
         credits.style.opacity = '1';
         credits.style.transform = 'translateY(0)';
-        version.style.opacity = '1';
-        version.style.transform = 'translateY(0)';
-    }, 10);
+
+        // Mostrar e animar a barra de progresso
+        loadingBar.style.opacity = '1';
+        loadingBar.style.transform = 'translateY(0)';
+        loadingProgress.style.width = '100%';
+    }, 100);
+}
+
+async function hideSplashScreen() {
+    splashScreen.style.opacity = '0';
+    setTimeout(() => splashScreen.remove(), 1000);
 };
-async function hideSplashScreen() { splashScreen.style.opacity = '0'; setTimeout(() => splashScreen.remove(), 1000); };
 
 async function loadScript(url, label) { return fetch(url).then(response => response.text()).then(script => { loadedPlugins.push(label); eval(script); }); }
 async function loadCss(url) { return new Promise((resolve) => { const link = document.createElement('link'); link.rel = 'stylesheet'; link.type = 'text/css'; link.href = url; link.onload = () => resolve(); document.head.appendChild(link); }); }
@@ -171,6 +260,77 @@ function setupMain() {
                 await delay(800);
             }
         })();
+    })();
+
+    /* Adicionar indicador visual flutuante */
+    (function () {
+        // Criar o indicador
+        const indicator = document.createElement('div');
+        indicator.className = 'kw-indicator';
+        indicator.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(10, 10, 10, 0.75);
+            color: white;
+            font-family: MuseoSans, sans-serif;
+            font-size: 12px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            z-index: 1000;
+            user-select: none;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(114, 255, 114, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateY(100px);
+            transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            animation: pulse-border 4s infinite ease-in-out;
+        `;
+
+        // Adicionar conteúdo ao indicador
+        indicator.innerHTML = `
+            <div style="width: 10px; height: 10px; background-color: #72ff72; border-radius: 50%; animation: pulse 2s infinite;"></div>
+            <div>KhanwareLite está ativo</div>
+        `;
+
+        // Adicionar estilos para animações
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes pulse {
+                0% { transform: scale(0.8); opacity: 0.7; }
+                50% { transform: scale(1.2); opacity: 1; }
+                100% { transform: scale(0.8); opacity: 0.7; }
+            }
+
+            @keyframes pulse-border {
+                0% { border-color: rgba(114, 255, 114, 0.2); }
+                50% { border-color: rgba(114, 255, 114, 0.5); }
+                100% { border-color: rgba(114, 255, 114, 0.2); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Adicionar o indicador ao body
+        document.body.appendChild(indicator);
+
+        // Mostrar o indicador após um atraso
+        setTimeout(() => {
+            indicator.style.transform = 'translateY(0)';
+
+            // Esconder o indicador após 5 segundos
+            setTimeout(() => {
+                indicator.style.transform = 'translateY(100px)';
+
+                // Remover depois de completar a animação
+                setTimeout(() => {
+                    indicator.remove();
+                }, 1000);
+            }, 5000);
+        }, 2000);
     })();
 }
 /* Inject */

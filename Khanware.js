@@ -67,38 +67,163 @@ const findAndClickBySelector = selector => { const element = document.querySelec
 function sendToast(text, duration = 5000, gravity = 'bottom') { Toastify({ text: text, duration: duration, gravity: gravity, position: "center", stopOnFocus: true, style: { background: "#000000" } }).showToast(); debug(text); };
 
 async function showSplashScreen() {
-    splashScreen.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background-color:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;opacity:0;transition:opacity 0.5s ease;user-select:none;color:white;font-family:MuseoSans,sans-serif;font-size:30px;text-align:center;";
+    splashScreen.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background-color:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;opacity:0;transition:opacity 0.5s ease;user-select:none;color:white;font-family:MuseoSans,sans-serif;font-size:30px;text-align:center;overflow:hidden;";
 
-    const logo = document.createElement('div');
-    logo.innerHTML = '<span style="color:white;text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #72ff72;">KHANWARE</span><span style="color:#72ff72;text-shadow:0 0 10px #72ff72,0 0 20px #72ff72;">.</span><span style="color:#72ff72;text-shadow:0 0 10px #72ff72,0 0 20px #72ff72;">SPACE</span>';
-    logo.style.cssText = "transform:scale(0.8);opacity:0;transition:all 0.7s cubic-bezier(0.19, 1, 0.22, 1);";
+    // Adicionar partículas ao background
+    const particles = document.createElement('div');
+    particles.className = 'particles';
+    particles.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:-1;";
 
+    // Criar 30 partículas
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        const size = Math.random() * 5 + 2;
+        const duration = Math.random() * 20 + 10;
+        const startPositionX = Math.random() * 100;
+        const startPositionY = Math.random() * 100;
+        const opacity = Math.random() * 0.5 + 0.3;
+
+        particle.style.cssText = `
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            background-color: rgba(114, 255, 114, ${opacity});
+            border-radius: 50%;
+            top: ${startPositionY}%;
+            left: ${startPositionX}%;
+            filter: blur(1px);
+            box-shadow: 0 0 10px rgba(114, 255, 114, 0.8);
+            animation: float ${duration}s infinite linear;
+            animation-delay: ${Math.random() * 5}s;
+        `;
+
+        particles.appendChild(particle);
+    }
+
+    splashScreen.appendChild(particles);
+
+    // Linha horizontal superior com brilho
+    const topLine = document.createElement('div');
+    topLine.style.cssText = "position:absolute;top:0;left:0;width:100%;height:1px;background:linear-gradient(to right, rgba(114, 255, 114, 0), rgba(114, 255, 114, 0.8) 50%, rgba(114, 255, 114, 0));transform:translateY(-100%);transition:transform 0.8s cubic-bezier(.17,.67,.35,1.25) 0.2s;";
+    splashScreen.appendChild(topLine);
+
+    // Linha horizontal inferior com brilho
+    const bottomLine = document.createElement('div');
+    bottomLine.style.cssText = "position:absolute;bottom:0;left:0;width:100%;height:1px;background:linear-gradient(to right, rgba(114, 255, 114, 0), rgba(114, 255, 114, 0.8) 50%, rgba(114, 255, 114, 0));transform:translateY(100%);transition:transform 0.8s cubic-bezier(.17,.67,.35,1.25) 0.2s;";
+    splashScreen.appendChild(bottomLine);
+
+    // Container principal para conteúdo centralizado
+    const contentContainer = document.createElement('div');
+    contentContainer.style.cssText = "display:flex;flex-direction:column;align-items:center;justify-content:center;transform:scale(0.9);opacity:0;transition:all 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.5s;";
+
+    // Logo animado
+    const logoContainer = document.createElement('div');
+    logoContainer.style.cssText = "position:relative;margin-bottom:20px;";
+
+    const logoText = document.createElement('div');
+    logoText.innerHTML = `
+        <span class="logo-text" style="display:inline-block;overflow:hidden;position:relative;">
+            <span style="color:white;display:inline-block;font-size:40px;font-weight:bold;transform:translateY(100%);transition:transform 0.5s cubic-bezier(.17,.67,.35,1.25) 0.8s;">K</span>
+            <span style="color:white;display:inline-block;font-size:40px;font-weight:bold;transform:translateY(100%);transition:transform 0.5s cubic-bezier(.17,.67,.35,1.25) 0.85s;">H</span>
+            <span style="color:white;display:inline-block;font-size:40px;font-weight:bold;transform:translateY(100%);transition:transform 0.5s cubic-bezier(.17,.67,.35,1.25) 0.9s;">A</span>
+            <span style="color:white;display:inline-block;font-size:40px;font-weight:bold;transform:translateY(100%);transition:transform 0.5s cubic-bezier(.17,.67,.35,1.25) 0.95s;">N</span>
+            <span style="color:white;display:inline-block;font-size:40px;font-weight:bold;transform:translateY(100%);transition:transform 0.5s cubic-bezier(.17,.67,.35,1.25) 1s;">W</span>
+            <span style="color:white;display:inline-block;font-size:40px;font-weight:bold;transform:translateY(100%);transition:transform 0.5s cubic-bezier(.17,.67,.35,1.25) 1.05s;">A</span>
+            <span style="color:white;display:inline-block;font-size:40px;font-weight:bold;transform:translateY(100%);transition:transform 0.5s cubic-bezier(.17,.67,.35,1.25) 1.1s;">R</span>
+            <span style="color:white;display:inline-block;font-size:40px;font-weight:bold;transform:translateY(100%);transition:transform 0.5s cubic-bezier(.17,.67,.35,1.25) 1.15s;">E</span>
+        </span>
+    `;
+
+    // Efeito glow sob o logo
+    const logoGlow = document.createElement('div');
+    logoGlow.style.cssText = "position:absolute;width:100%;height:20px;background:radial-gradient(ellipse at center, rgba(114, 255, 114, 0.5) 0%, rgba(114, 255, 114, 0) 70%);bottom:-20px;left:0;opacity:0;transition:opacity 1s ease 1.3s;filter:blur(5px);";
+
+    logoContainer.appendChild(logoText);
+    logoContainer.appendChild(logoGlow);
+    contentContainer.appendChild(logoContainer);
+
+    // Versão e desenvolvedor
     const credits = document.createElement('div');
-    credits.innerHTML = '<span style="font-size:14px;margin-top:30px;opacity:0.8;">by <span style="color:#72ff72;">@im.nix</span> & <span style="color:#72ff72;">@mairinkdev</span></span>';
-    credits.style.cssText = "margin-top:20px;opacity:0;transform:translateY(20px);transition:all 0.7s cubic-bezier(0.19, 1, 0.22, 1) 0.3s;";
+    credits.style.cssText = "display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(20px);transition:all 0.7s ease 1.5s;";
 
-    const version = document.createElement('div');
-    version.innerHTML = `<span style="font-size:12px;margin-top:10px;opacity:0.5;">${ver}</span>`;
-    version.style.cssText = "margin-top:10px;opacity:0;transform:translateY(20px);transition:all 0.7s cubic-bezier(0.19, 1, 0.22, 1) 0.5s;";
+    const versionText = document.createElement('div');
+    versionText.innerHTML = `<span style="font-size:14px;color:rgba(255,255,255,0.7);">${ver}</span>`;
 
-    splashScreen.appendChild(logo);
-    splashScreen.appendChild(credits);
-    splashScreen.appendChild(version);
+    const authorText = document.createElement('div');
+    authorText.innerHTML = `<span style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:10px;">by <span style="color:#72ff72;">@im.nix</span> & <span style="color:#72ff72;">@mairinkdev</span></span>`;
 
+    credits.appendChild(versionText);
+    credits.appendChild(authorText);
+    contentContainer.appendChild(credits);
+
+    // Barra de loading animada
+    const loadingBar = document.createElement('div');
+    loadingBar.style.cssText = "width:200px;height:2px;background-color:rgba(50,50,50,0.5);margin-top:30px;border-radius:2px;overflow:hidden;opacity:0;transform:translateY(20px);transition:all 0.7s ease 1.7s;";
+
+    const loadingProgress = document.createElement('div');
+    loadingProgress.style.cssText = "width:0%;height:100%;background:linear-gradient(to right, #72ff72, #a0ff9d);border-radius:2px;transition:width 1.5s cubic-bezier(.08,.82,.17,1) 2s;";
+
+    loadingBar.appendChild(loadingProgress);
+    contentContainer.appendChild(loadingBar);
+
+    // Adicionar o container de conteúdo ao splash screen
+    splashScreen.appendChild(contentContainer);
+
+    // Adicionar animações CSS
+    const animStyles = document.createElement('style');
+    animStyles.innerHTML = `
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-20px, 20px) rotate(90deg); }
+            50% { transform: translate(20px, 40px) rotate(180deg); }
+            75% { transform: translate(-30px, -20px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(animStyles);
+
+    // Adicionar ao body
     document.body.appendChild(splashScreen);
 
+    // Iniciar animações após um pequeno atraso
     setTimeout(() => {
         splashScreen.style.opacity = '1';
-        logo.style.transform = 'scale(1)';
-        logo.style.opacity = '1';
+        topLine.style.transform = 'translateY(0)';
+        bottomLine.style.transform = 'translateY(0)';
+        contentContainer.style.opacity = '1';
+        contentContainer.style.transform = 'scale(1)';
+
+        // Animar cada letra do logo
+        const letters = logoText.querySelectorAll('span > span');
+        letters.forEach(letter => {
+            letter.style.transform = 'translateY(0)';
+        });
+
+        // Mostrar o glow
+        logoGlow.style.opacity = '1';
+
+        // Mostrar os créditos
         credits.style.opacity = '1';
         credits.style.transform = 'translateY(0)';
-        version.style.opacity = '1';
-        version.style.transform = 'translateY(0)';
-    }, 10);
+
+        // Mostrar e animar a barra de progresso
+        loadingBar.style.opacity = '1';
+        loadingBar.style.transform = 'translateY(0)';
+        loadingProgress.style.width = '100%';
+    }, 100);
 }
 
-async function hideSplashScreen() { splashScreen.style.opacity = '0'; setTimeout(() => splashScreen.remove(), 1000); };
+async function hideSplashScreen() {
+    // Fade out suave
+    splashScreen.style.opacity = '0';
+    setTimeout(() => splashScreen.remove(), 1000);
+};
 
 async function loadScript(url, label) { return fetch(url).then(response => response.text()).then(script => { loadedPlugins.push(label); eval(script); }); }
 async function loadCss(url) { return new Promise((resolve) => { const link = document.createElement('link'); link.rel = 'stylesheet'; link.type = 'text/css'; link.href = url; link.onload = () => resolve(); document.head.appendChild(link); }); }
